@@ -8,70 +8,45 @@ This document summarizes the complete implementation of the BONGAS-ML package, w
 
 ```txt
 bongas-ml/
-├── bongas_ml/                    # Main package
-│   ├── __init__.py              # Package initialization
-│   ├── __main__.py              # CLI entry point
-│   ├── models/                  # Model definitions
-│   │   ├── __init__.py
-│   │   ├── base.py             # BaseModel class
-│   │   └── two_tower.py        # TwoTowerModel implementation
-│   ├── training/               # Training framework
-│   │   ├── __init__.py
-│   │   ├── trainer.py          # Trainer class
-│   │   ├── datasets.py         # Dataset classes
-│   │   ├── callbacks.py        # Training callbacks
-│   │   ├── losses.py          # Loss functions
-│   │   └── metrics.py         # Evaluation metrics
-│   ├── features/               # Feature engineering
-│   │   ├── __init__.py
-│   │   ├── extractors.py       # Feature extractors
-│   │   ├── transformers.py     # Feature transformers
-│   │   └── embeddings.py       # Embedding utilities
-│   ├── export/                 # Model export
-│   │   ├── __init__.py
-│   │   ├── onnx_exporter.py    # ONNX export functionality
-│   │   ├── optimize.py         # Model optimization
-│   │   └── validate.py         # Model validation
-│   ├── registry/               # Model registry client
-│   │   ├── __init__.py
-│   │   └── client.py           # Registry client
-│   ├── validation/             # Model validation
-│   │   ├── __init__.py
-│   │   ├── accuracy.py         # Accuracy validation
-│   │   ├── baseline.py         # Baseline comparison
-│   │   └── shadow.py           # Shadow testing
-│   └── utils/                  # Utility functions
-│       ├── __init__.py
-│       └── logging.py          # Logging utilities
-├── scripts/                    # Utility scripts
-│   ├── train_and_export.sh     # Training and export script
-│   ├── validate_onnx.py        # ONNX validation script
-│   └── package.sh             # Packaging script
-├── tests/                     # Test suite
-│   ├── __init__.py
-│   ├── test_models.py         # Model tests
-│   ├── test_training.py       # Training tests
-│   ├── test_features.py       # Feature tests
-│   ├── test_export.py         # Export tests
-│   ├── test_registry.py       # Registry tests
-│   └── test_validation.py     # Validation tests
-├── docs/                      # Documentation
-│   ├── api_reference.md       # API documentation
-│   ├── architecture.md        # Architecture documentation
-│   ├── ml_integration.md      # ML integration guide
-│   ├── onnx_deployment.md     # ONNX deployment guide
-│   └── scenarios.md           # Usage scenarios
-├── pyproject.toml             # Modern Python packaging
-├── setup.py                   # Legacy setup script
-├── requirements.txt            # Dependencies
-├── README.md                  # Package documentation
-├── .gitignore                 # Git ignore rules
-└── LICENSE                    # MIT License
+├── src/                          # Main source code
+│   └── ml/                       # Core ML package
+│       ├── data/                 # Data loading and preprocessing
+│       ├── export/               # ONNX export and optimization
+│       ├── features/             # Feature engineering
+│       ├── models/               # Model definitions
+│       ├── registry/             # Model registry client
+│       ├── training/             # Training framework
+│       ├── validation/           # Validation metrics and tools
+│       └── utils/                # Utility functions
+├── factory/                      # Factory design components
+│   ├── builders/                 # Model construction logic
+│   ├── exporters/                # Specialized ONNX exporters
+│   ├── trainer/                  # Obfuscated sovereign training
+│   └── legacy_scripts/           # Deprecated utilities
+├── research/                     # Exploratory Data Analysis (EDA) sandbox
+│   ├── vision/                   # sight-core (Visual DNA)
+│   ├── language/                 # sense-core (SLM reasoning)
+│   ├── ranking/                  # Behavioral tribe affinity
+│   └── sequential/               # Flow prediction
+├── docs/                         # Sovereign Intelligence Documentation
+│   ├── architecture/             # High-level system design
+│   ├── engine/                   # The runtime inference engine
+│   ├── factory/                  # Factory pipeline documentation
+│   └── research/                 # Lab and experimentation methodologies
+├── tests/                        # Automated test suite
+│   ├── unit/                     # Unit tests
+│   ├── integration/              # Integration tests
+│   └── performance/              # Performance benchmarks
+├── pyproject.toml                # Modern Python packaging
+├── setup.py                      # Legacy setup script
+├── requirements.txt              # Dependencies
+├── README.md                     # Package documentation
+└── LICENSE                       # MIT License
 ```
 
 ## Key Components Implemented
 
-### 1. Model Framework (`bongas_ml/models/`)
+### 1. Model Framework (`src/ml/models/`)
 
 **BaseModel Class**:
 
@@ -87,7 +62,7 @@ bongas-ml/
 - Efficient similarity computation
 - Production-ready implementation
 
-### 2. Training Framework (`bongas_ml/training/`)
+### 2. Training Framework (`src/ml/training/`)
 
 **Trainer Class**:
 
@@ -111,7 +86,7 @@ bongas-ml/
 - Learning rate scheduling
 - Custom callback support
 
-### 3. Feature Engineering (`bongas_ml/features/`)
+### 3. Feature Engineering (`src/ml/features/`)
 
 **FeatureExtractor**:
 
@@ -134,7 +109,7 @@ bongas-ml/
 - Embedding optimization
 - Memory-efficient storage
 
-### 4. Model Export (`bongas_ml/export/`)
+### 4. Model Export (`src/ml/export/`)
 
 **ONNXExporter**:
 
@@ -157,7 +132,7 @@ bongas-ml/
 - Model integrity checks
 - Compatibility validation
 
-### 5. Model Registry (`bongas_ml/registry/`)
+### 5. Model Registry (`src/ml/registry/`)
 
 **ModelRegistryClient**:
 
@@ -167,7 +142,7 @@ bongas-ml/
 - Customer-specific model handling
 - Metadata management
 
-### 6. Model Validation (`bongas_ml/validation/`)
+### 6. Model Validation (`src/ml/validation/`)
 
 **AccuracyValidator**:
 
@@ -190,7 +165,7 @@ bongas-ml/
 - Production validation
 - Automated promotion recommendations
 
-### 7. Utilities (`bongas_ml/utils/`)
+### 7. Utilities (`src/ml/utils/`)
 
 **Logging**:
 
@@ -205,16 +180,16 @@ The package provides a comprehensive CLI interface:
 
 ```bash
 # Train models
-python -m bongas_ml train --data data.csv --model-type two_tower --epochs 100
+python -m ml train --data data.csv --model-type two_tower --epochs 100
 
 # Export models
-python -m bongas_ml export --model model.pth --output model.onnx --optimize --quantize
+python -m ml export --model model.pth --output model.onnx --optimize --quantize
 
 # Validate models
-python -m bongas_ml validate --model model.onnx --test-data test.csv
+python -m ml validate --model model.onnx --test-data test.csv
 
 # Registry operations
-python -m bongas_ml registry upload --model model.onnx --customer customer123
+python -m ml registry upload --model model.onnx --customer customer123
 ```
 
 ## Integration with BONGAS-AI Architecture

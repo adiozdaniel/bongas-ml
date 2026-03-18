@@ -21,12 +21,12 @@ from typing import Dict, List, Optional, Set
 import click
 from loguru import logger
 
-from bongas_ml.data.loader import TrainingDataLoader
-from bongas_ml.export.onnx_exporter import ONNXExporter
-from bongas_ml.models.two_tower import TwoTowerModel
-from bongas_ml.registry.client import ModelRegistryClient
-from bongas_ml.training.trainer import CustomerModelTrainer
-from bongas_ml.utils.logging import setup_logging
+from ml.data.loader import TrainingDataLoader
+from ml.export.onnx_exporter import ONNXExporter
+from ml.models.two_tower import TwoTowerModel
+from ml.registry.client import ModelRegistryClient
+from ml.training.trainer import CustomerModelTrainer
+from ml.utils.logging import setup_logging
 
 
 class NightlyTrainingJob:

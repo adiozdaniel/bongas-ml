@@ -43,18 +43,18 @@ jobs:
         run: |
           pip install flake8 black
           # stop the build if there are Python syntax errors or undefined names
-          flake8 bongas_ml tests --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 src tests --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 bongas_ml tests --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          flake8 src tests --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
       - name: Type check with mypy
         run: |
           pip install mypy
-          mypy bongas_ml
+          mypy src
 
       - name: Test with pytest
         run: |
-          pytest tests/ -v --cov=bongas_ml --cov-report=xml --cov-report=html
+          pytest tests/ -v --cov=ml --cov-report=xml --cov-report=html
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -105,4 +105,4 @@ jobs:
 
       - name: Test Docker image
         run: |
-          docker run --rm bongas-ml:ci python -c "import bongas_ml; print('Docker image works!')"
+          docker run --rm bongas-ml:ci python -c "import ml; print('Docker image works!')"

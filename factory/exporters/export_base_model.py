@@ -22,7 +22,7 @@ def export_sight_core_to_onnx():
     
     # 1. Define Paths
     # The "Factory" location where we keep the raw PyTorch weights
-    source_dir = Path("bongas_ml/models/sight-core")
+    source_dir = Path("src/ml/models/sight-core")
     
     # The "Release" location where we ship the obfuscated ONNX model
     release_dir = Path("../bongas-ai/release/models/frozen/sight-core")

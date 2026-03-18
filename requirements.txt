@@ -11,6 +11,7 @@ pyyaml>=6.0
 click>=8.0.0
 
 # Optional dependencies for development
+Cython>=3.0.0
 pytest>=7.0.0
 pytest-cov>=4.0.0
 black>=22.0.0

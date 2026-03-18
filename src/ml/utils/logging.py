@@ -142,7 +142,7 @@ class LoggingContext:
 
 
 def configure_package_logging():
-    """Configure logging for the entire bongas_ml package"""
+    """Configure logging for the entire ml package"""
     
     # Configure root logger
     setup_logging(

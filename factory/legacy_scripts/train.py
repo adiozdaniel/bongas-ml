@@ -13,10 +13,10 @@ from typing import Optional
 import click
 from loguru import logger
 
-from bongas_ml.data.loader import TrainingDataLoader
-from bongas_ml.models.two_tower import TwoTowerModel
-from bongas_ml.training.trainer import CustomerModelTrainer
-from bongas_ml.utils.logging import setup_logging
+from ml.data.loader import TrainingDataLoader
+from ml.models.two_tower import TwoTowerModel
+from ml.training.trainer import CustomerModelTrainer
+from ml.utils.logging import setup_logging
 
 
 @click.group()
@@ -157,7 +157,7 @@ def export(
     logger.info(f"Exporting model for customer {customer_id}")
     
     try:
-        from bongas_ml.export.onnx_exporter import ONNXExporter
+        from ml.export.onnx_exporter import ONNXExporter
         
         # Load model
         trainer = CustomerModelTrainer()

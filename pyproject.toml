@@ -64,13 +64,14 @@ Repository = "https://github.com/Bongas-Squad/bongas-ml"
 Issues = "https://github.com/Bongas-Squad/bongas-ml/issues"
 
 [project.scripts]
-bongas-ml = "bongas_ml.__main__:main"
+bongas-ml = "ml.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["bongas_ml*"]
+where = ["src"]
+include = ["ml*"]
 
 [tool.setuptools.package-data]
-bongas_ml = ["py.typed"]
+ml = ["py.typed"]
 
 [tool.black]
 line-length = 88
@@ -117,7 +118,7 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["bongas_ml"]
+source = ["ml"]
 omit = ["*/tests/*", "*/test_*", "*/__init__.py"]
 
 [tool.coverage.report]

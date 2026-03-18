@@ -24,7 +24,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Bongas-Squad/bongas-ml",
-    packages=find_packages(),
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -63,12 +64,12 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "bongas-ml=bongas_ml.__main__:main",
+            "bongas-ml=ml.__main__:main",
         ],
     },
     include_package_data=True,
     package_data={
-        "bongas_ml": ["py.typed"],
+        "ml": ["py.typed"],
     },
     zip_safe=False,
 )

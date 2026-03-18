@@ -26,9 +26,11 @@ WORKDIR /app
 
 # Copy project files
 COPY pyproject.toml .
-COPY bongas_ml/ ./bongas_ml/
+COPY src/ ./src/
 COPY configs/ ./configs/
-COPY scripts/ ./scripts/
+COPY factory/ ./factory/
+
+ENV PYTHONPATH="/app/src"
 
 # Create outputs directory
 RUN mkdir -p outputs
@@ -55,4 +57,4 @@ CMD ["bash"]
 # Production stage
 FROM base as production
 USER bongas
-CMD ["python", "-m", "bongas_ml.scripts.nightly_job", "--help"]
+CMD ["python", "factory/legacy_scripts/nightly_job.py", "--help"]
