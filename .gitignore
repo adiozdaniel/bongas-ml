@@ -158,6 +158,7 @@ Desktop.ini
 *.feather
 *.h5
 *.hdf5
+*.safetensors
 
 # Logs
 *.log
