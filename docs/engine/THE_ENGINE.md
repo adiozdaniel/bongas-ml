@@ -8,19 +8,19 @@ The universal toolkit for sophisticated discovery pipelines.
 
 ## Engine Modules
 
-### 1. Models (`src/ml/models/`)
+### 1. Models (`src/models/`)
 
 Reusable PyTorch Legos (Base, TwoTower, Transformers).
 
-### 2. Training (`src/ml/training/`)
+### 2. Training (`src/training/`)
 
 Optimized loops and loss functions (PairwiseHinge, ListMLE).
 
-### 3. Features (`src/ml/features/`)
+### 3. Features (`src/features/`)
 
 Deterministic data transformations and categorical encoders.
 
-### 4. Data (`src/ml/data/`)
+### 4. Data (`src/data/`)
 
 High-throughput ClickHouse iterators and memory-safe loaders.
 

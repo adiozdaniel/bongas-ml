@@ -36,7 +36,7 @@ lint:code:
 test:engine:
   stage: test
   script:
-    - pytest tests/unit/ --cov=src/ml
+    - pytest tests/unit/ --cov=src
   artifacts:
     reports:
       coverage_report:

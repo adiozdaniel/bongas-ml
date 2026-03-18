@@ -21,12 +21,12 @@ from typing import Dict, List, Optional, Set
 import click
 from loguru import logger
 
-from ml.data.loader import TrainingDataLoader
-from ml.export.onnx_exporter import ONNXExporter
-from ml.models.two_tower import TwoTowerModel
-from ml.registry.client import ModelRegistryClient
-from ml.training.trainer import CustomerModelTrainer
-from ml.utils.logging import setup_logging
+from data.loader import TrainingDataLoader
+from export.onnx_exporter import ONNXExporter
+from models.two_tower import TwoTowerModel
+from registry.client import ModelRegistryClient
+from training.trainer import CustomerModelTrainer
+from utils.logging import setup_logging
 
 
 class NightlyTrainingJob:

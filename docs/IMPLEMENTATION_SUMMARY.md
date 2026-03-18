@@ -8,16 +8,15 @@ This document summarizes the complete implementation of the BONGAS-ML package, w
 
 ```txt
 bongas-ml/
-├── src/                          # Main source code
-│   └── ml/                       # Core ML package
-│       ├── data/                 # Data loading and preprocessing
-│       ├── export/               # ONNX export and optimization
-│       ├── features/             # Feature engineering
-│       ├── models/               # Model definitions
-│       ├── registry/             # Model registry client
-│       ├── training/             # Training framework
-│       ├── validation/           # Validation metrics and tools
-│       └── utils/                # Utility functions
+├── src/                          # Core ML package
+│   ├── data/                     # Data loading and preprocessing
+│   ├── export/                   # ONNX export and optimization
+│   ├── features/                 # Feature engineering
+│   ├── models/                   # Model definitions
+│   ├── registry/                 # Model registry client
+│   ├── training/                 # Training framework
+│   ├── validation/               # Validation metrics and tools
+│   └── utils/                    # Utility functions
 ├── factory/                      # Factory design components
 │   ├── builders/                 # Model construction logic
 │   ├── exporters/                # Specialized ONNX exporters
@@ -46,7 +45,7 @@ bongas-ml/
 
 ## Key Components Implemented
 
-### 1. Model Framework (`src/ml/models/`)
+### 1. Model Framework (`src/models/`)
 
 **BaseModel Class**:
 
@@ -62,7 +61,7 @@ bongas-ml/
 - Efficient similarity computation
 - Production-ready implementation
 
-### 2. Training Framework (`src/ml/training/`)
+### 2. Training Framework (`src/training/`)
 
 **Trainer Class**:
 
@@ -86,7 +85,7 @@ bongas-ml/
 - Learning rate scheduling
 - Custom callback support
 
-### 3. Feature Engineering (`src/ml/features/`)
+### 3. Feature Engineering (`src/features/`)
 
 **FeatureExtractor**:
 
@@ -109,7 +108,7 @@ bongas-ml/
 - Embedding optimization
 - Memory-efficient storage
 
-### 4. Model Export (`src/ml/export/`)
+### 4. Model Export (`src/export/`)
 
 **ONNXExporter**:
 
@@ -132,7 +131,7 @@ bongas-ml/
 - Model integrity checks
 - Compatibility validation
 
-### 5. Model Registry (`src/ml/registry/`)
+### 5. Model Registry (`src/registry/`)
 
 **ModelRegistryClient**:
 
@@ -142,7 +141,7 @@ bongas-ml/
 - Customer-specific model handling
 - Metadata management
 
-### 6. Model Validation (`src/ml/validation/`)
+### 6. Model Validation (`src/validation/`)
 
 **AccuracyValidator**:
 
@@ -165,7 +164,7 @@ bongas-ml/
 - Production validation
 - Automated promotion recommendations
 
-### 7. Utilities (`src/ml/utils/`)
+### 7. Utilities (`src/utils/`)
 
 **Logging**:
 
