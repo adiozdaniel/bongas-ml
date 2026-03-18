@@ -8,7 +8,7 @@ The designated **Vendor-Only Sandbox** for heavy experimentation.
 
 ## Research Pillars
 
-* **Vision:** `research/vision/` - `sight-core` (V-JEPA) experiments.
+* **Vision:** `research/vision/` - `sight-core` (Visual DNA) experiments.
 * **Language:** `research/language/` - `sense-core` (SLM) reasoning.
 * **Ranking:** `research/ranking/` - Behavioral tribe affinity.
 * **Sequential:** `research/sequential/` - BERT4Rec flow prediction.
