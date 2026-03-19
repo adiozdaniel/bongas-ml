@@ -44,7 +44,7 @@ def export_sight_core_to_onnx():
         processor = AutoVideoProcessor.from_pretrained(source_dir)
         
         # 3. Prepare Dummy Input for Tracing
-        # V-JEPA 2 expects a specific 5D tensor shape for video frames:
+        # Foundation Vision Model 2 expects a specific 5D tensor shape for video frames:
         # [batch_size, num_channels, num_frames, height, width]
         # We use the processor config to get the exact dimensions
         crop_size = model.config.crop_size
