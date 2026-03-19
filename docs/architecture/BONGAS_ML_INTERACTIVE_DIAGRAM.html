@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bongas-ML Sovereign Intelligence Architecture</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 { color: #0f172a; margin: 0 0 10px 0; font-weight: 300; letter-spacing: -1px; font-size: 32px; }
+        p { color: #64748b; margin-bottom: 50px; text-transform: uppercase; font-size: 11px; font-weight: 700; letter-spacing: 3px; }
+        
+        .mermaid-outer {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            justify-content: flex-start;
+            padding-bottom: 80px;
+        }
+
+        .mermaid-container {
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .mermaid svg {
+            background-color: transparent !important;
+            min-width: 1600px !important;
+            width: 100% !important;
+            height: auto !important;
+            max-width: none !important;
+        }
+
+        @keyframes data-flow {
+            from { stroke-dashoffset: 20; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* Colors for ML flows */
+        path[style*="stroke:#00b894"], path[style*="stroke: #00b894"] {
+            animation: data-flow 1s linear infinite !important;
+        }
+        path[style*="stroke:#0984e3"], path[style*="stroke: #0984e3"] {
+            animation: data-flow 1.5s linear infinite !important;
+        }
+        path[style*="stroke:#e17055"], path[style*="stroke: #e17055"] {
+            animation: data-flow 2s linear infinite !important;
+        }
+        path[style*="stroke:#9b59b6"], path[style*="stroke: #9b59b6"] {
+            animation: data-flow 2.5s linear infinite !important;
+        }
+
+        .cluster rect, g.cluster rect, .cluster > rect {
+            fill: transparent !important;
+            fill-opacity: 0 !important;
+            stroke: #cbd5e1 !important;
+            stroke-width: 2px !important;
+            stroke-dasharray: 6, 6 !important;
+        }
+        
+        .cluster .label {
+            fill: #64748b !important;
+            font-size: 14px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 2px !important;
+            font-weight: 800 !important;
+        }
+
+        .node rect, .node circle, .node polygon, .node path {
+            fill: #ffffff !important;
+            stroke: #475569 !important;
+            stroke-width: 2.5px !important;
+        }
+
+        .node .label {
+            color: #0f172a !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            padding: 5px !important;
+        }
+
+        .legend {
+            position: fixed;
+            bottom: 30px;
+            display: flex;
+            gap: 40px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            font-size: 12px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            border: 1px solid #e2e8f0;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+        .legend-item { display: flex; align-items: center; gap: 10px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+    </style>
+</head>
+<body>
+
+    <h1>BONGAS-ML SOVEREIGN INTELLIGENCE</h1>
+    <p>Bifurcated Training Factory & Sovereign Delivery</p>
+
+    <div class="mermaid-outer">
+        <div class="mermaid-container">
+            <div class="mermaid">
+    graph LR
+    subgraph VendorRegion ["<br/><br/><br/><br/>Vendor Infrastructure & Registry"]
+        direction TB
+        %% Bongas-Server (Central Middleman)
+        subgraph CentralRegistry ["Bongas-Server (Central Registry)"]
+            RegistryAPI["Registry Core API<br/>(Distribution & Models)"]
+        end
+
+        %% Vendor Environment
+        subgraph VendorEnv ["Bongas-ML Factory (Vendor Server)"]
+            GoldenData["Golden Datasets<br/>(Global Content)"]
+            PreTraining["Foundation Pre-Training<br/>(Heavy Compute)"]
+            Obfuscator["Cython Compiler<br/>(IP Protection)"]
+            VendorBundle["bongas-ml-bundle.tar.gz<br/>(All Compiled Artifacts)"]
+        end
+    end
+
+    %% Client Sovereign Environment
+    subgraph ClientVPC ["Client Sovereign VPC (On-Premise)"]
+        RawContent["Raw Videos / Content"]
+        ClickHouse["ClickHouse<br/>(Feedback & Ledgers)"]
+        BongasAIBin["Bongas-AI Binary<br/>(Security)"]
+        ClientBundle["Downloaded Bundle<br/>(bongas-ml-bundle.tar.gz)"]
+
+        subgraph SovereignEngine ["Sovereign Training Engine"]
+            ExecTrainer["trainer.so<br/>(Orchestrator & Execution)"]
+            ExecSenses["weights.safetensors<br/>(Frozen Inference)"]
+
+            VisionTuned["vision_head.onnx<br/>(Fine-Tuned)"]
+            SLMTuned["slm_head.onnx<br/>(Fine-Tuned)"]
+            FlowTuned["flow_head.onnx<br/>(Fine-Tuned)"]
+            RankingTuned["ranking.onnx<br/>(Fine-Tuned)"]
+        end
+    end
+
+    %% --- CONNECTIONS ---
+    %% Vendor Factory (Blue)
+    %% Indices 0-3
+    GoldenData --> PreTraining
+    PreTraining --> Obfuscator
+    Obfuscator --> VendorBundle
+    PreTraining -.-> VendorBundle
+
+    %% Export to Server (Purple)
+    %% Indices 4
+    VendorBundle --> RegistryAPI
+
+    %% Server to VPC Delivery (Green)
+    %% Indices 5-11
+    RegistryAPI --->|Client Downloads Bundle| ClientBundle
+    ClientBundle -->|Unpacks| ExecTrainer
+    ClientBundle -->|Unpacks| ExecSenses
+    ClientBundle -->|Unpacks Base| VisionTuned
+    ClientBundle -->|Unpacks Base| SLMTuned
+    ClientBundle -->|Unpacks Base| FlowTuned
+    ClientBundle -->|Unpacks Base| RankingTuned
+
+    %% Sovereign Orchestration & Security (Orange)
+    %% Indices 12-13
+    ExecTrainer -->|Verifies Security| BongasAIBin
+    ExecTrainer <--->|Heart Beat, Updates & Security Checks| RegistryAPI
+
+    %% Sensing & Feedback Loop (Green)
+    %% Indices 14-16
+    RawContent --> ExecSenses
+    ExecSenses -->|Semantic DNA| ClickHouse
+    ClickHouse -->|Ledgers| ExecTrainer
+
+    %% Sovereign Training (Orange)
+    %% Indices 17-20
+    ExecTrainer --> VisionTuned
+    ExecTrainer --> SLMTuned
+    ExecTrainer --> FlowTuned
+    ExecTrainer --> RankingTuned
+
+    %% Force Vertical Stack in LR Graph (Hidden)
+    CentralRegistry ~~~ VendorEnv
+
+    %% --- STYLING ---
+    classDef default fill:#ffffff,stroke:#475569,stroke-width:2px,color:#0f172a;
+
+    %% Indices mapped to animation classes
+    linkStyle 0,1,2,3 stroke:#0984e3,stroke-width:2.5px,stroke-dasharray: 5 5;
+    linkStyle 4 stroke:#9b59b6,stroke-width:3px,stroke-dasharray: 5 5;
+    linkStyle 5,6,7,8,9,10,11 stroke:#00b894,stroke-width:3.5px,stroke-dasharray: 5 5;
+    linkStyle 12,13 stroke:#e17055,stroke-width:2.5px,stroke-dasharray: 5 5;
+    linkStyle 14,15,16 stroke:#00b894,stroke-width:3.5px,stroke-dasharray: 5 5;
+    linkStyle 17,18,19,20 stroke:#e17055,stroke-width:2.5px,stroke-dasharray: 5 5;            </div>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><span class="dot" style="background:#0984e3"></span> Factory Compute</div>
+        <div class="legend-item"><span class="dot" style="background:#9b59b6"></span> Export & Delivery</div>
+        <div class="legend-item"><span class="dot" style="background:#00b894"></span> Data & Sensing</div>
+        <div class="legend-item"><span class="dot" style="background:#e17055"></span> Sovereign Training</div>
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                nodeSpacing: 80,
+                rankSpacing: 120
+            },
+            themeVariables: {
+                primaryColor: '#ffffff',
+                lineColor: '#475569',
+                clusterBkg: 'none', 
+                mainBkg: 'none',
+                nodeBkg: '#ffffff',
+                fontFamily: 'inherit',
+                fontSize: '16px'
+            }
+        });
+    </script>
+</body>
+</html>
