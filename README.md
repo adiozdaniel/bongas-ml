@@ -25,7 +25,7 @@ graph LR
             GoldenData["Golden Datasets<br/>(Global Content)"]
             PreTraining["Foundation Pre-Training<br/>(Heavy Compute)"]
             Obfuscator["Cython Compiler<br/>(IP Protection)"]
-            VendorBundle["bongas-ml-bundle.tar.gz<br/>(All Compiled Artifacts)"]
+            VendorImage["Docker Image: bongas-ml-engine:latest<br/>(Layers: Frozen Senses + trainer.so)"]
         end
 
         %% Force Vertical Stack in LR Graph
@@ -37,7 +37,7 @@ graph LR
         RawContent["Raw Videos / Content"]
         ClickHouse["ClickHouse<br/>(Feedback & Ledgers)"]
         BongasAIBin["Bongas-AI Binary<br/>(Security)"]
-        ClientBundle["Downloaded Bundle<br/>(bongas-ml-bundle.tar.gz)"]
+        MLContainer["Asynchronous ML Sidecar<br/>(Docker Container)"]
         
         subgraph SovereignEngine ["Sovereign Training Engine"]
             ExecTrainer["trainer.so<br/>(Orchestrator & Execution)"]
@@ -54,24 +54,24 @@ graph LR
     %% Vendor Factory
     GoldenData --> PreTraining
     PreTraining --> Obfuscator
-    Obfuscator --> VendorBundle
-    PreTraining -.-> VendorBundle
+    Obfuscator --> VendorImage
+    PreTraining -.-> VendorImage
     
     %% Export to Server
-    VendorBundle --> RegistryAPI
+    VendorImage --> RegistryAPI
 
-    %% Server to VPC Delivery (Single Download)
-    RegistryAPI --->|Client Downloads Bundle| ClientBundle
-    ClientBundle -->|Unpacks| ExecTrainer
-    ClientBundle -->|Unpacks| ExecSenses
-    ClientBundle -->|Unpacks Base| VisionTuned
-    ClientBundle -->|Unpacks Base| SLMTuned
-    ClientBundle -->|Unpacks Base| FlowTuned
-    ClientBundle -->|Unpacks Base| RankingTuned
+    %% Server to VPC Delivery (Docker Pull)
+    RegistryAPI --->|Docker Pull Layered| MLContainer
+    MLContainer -->|Top Layer| ExecTrainer
+    MLContainer -->|Base Layer| ExecSenses
+    MLContainer -->|Base Layer| VisionTuned
+    MLContainer -->|Base Layer| SLMTuned
+    MLContainer -->|Base Layer| FlowTuned
+    MLContainer -->|Base Layer| RankingTuned
 
     %% Sovereign Orchestration & Security
     ExecTrainer -->|Verifies Security| BongasAIBin
-    ExecTrainer <--->|Heart Beat, Updates & Security Checks| RegistryAPI
+    ExecTrainer <--->|mTLS Heart Beat & Decryption Keys| RegistryAPI
     
     %% Sensing & Feedback Loop
     RawContent --> ExecSenses
