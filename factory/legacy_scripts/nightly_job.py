@@ -5,7 +5,7 @@ BONGAS-ML Nightly Training Job
 Automated nightly training pipeline that:
 1. Identifies customers needing training
 2. Trains models per customer
-3. Exports to ONNX with validation
+3. Exports to Safetensors weights
 4. Uploads to model registry
 5. Handles failures and notifications
 """
@@ -22,7 +22,7 @@ import click
 from loguru import logger
 
 from data.loader import TrainingDataLoader
-from export.onnx_exporter import ONNXExporter
+from export.safetensors_exporter import SafetensorsExporter
 from models.two_tower import TwoTowerModel
 from registry.client import ModelRegistryClient
 from training.trainer import CustomerModelTrainer
@@ -47,7 +47,7 @@ class NightlyTrainingJob:
         # Initialize components
         self.data_loader = TrainingDataLoader(db_url)
         self.trainer = CustomerModelTrainer()
-        self.exporter = ONNXExporter(str(self.output_dir))
+        self.exporter = SafetensorsExporter(str(self.output_dir))
         self.registry = ModelRegistryClient(registry_url)
         
         # Create output directories
@@ -158,21 +158,19 @@ class NightlyTrainingJob:
             model_path = self.output_dir / f"pytorch_{customer_id}.pt"
             self.trainer.save_model(model, model_path)
             
-            # Export to ONNX
-            onnx_metadata = self.exporter.export_two_tower(
+            # Export to Safetensors
+            output_path = self.exporter.export(
                 model,
-                model_name=f"onnx_{customer_id}_{datetime.now().strftime('%Y%m%d')}",
-                user_feature_dim=128,
-                item_feature_dim=128,
-                optimize=True
+                model_name=f"safetensors_{customer_id}_{datetime.now().strftime('%Y%m%d')}",
+                version=datetime.now().strftime('%Y%m%d')
             )
             
             result['exported'] = True
-            logger.info(f"ONNX export successful for {customer_id}")
+            logger.info(f"Safetensors export successful for {customer_id}")
             
             # Upload to registry
             upload_result = await self._upload_model_to_registry(
-                customer_id, onnx_metadata['onnx_path']
+                customer_id, str(output_path)
             )
             
             if upload_result:
@@ -188,9 +186,9 @@ class NightlyTrainingJob:
     async def _upload_model_to_registry(
         self, 
         customer_id: str, 
-        onnx_path: str
+        model_path: str
     ) -> bool:
-        """Upload ONNX model to registry"""
+        """Upload model to registry"""
         
         try:
             # Create model metadata
@@ -199,8 +197,8 @@ class NightlyTrainingJob:
                 'model_type': 'two_tower',
                 'version': datetime.now().strftime('%Y%m%d'),
                 'training_date': datetime.now().isoformat(),
-                'framework': 'onnx',
-                'framework_version': '1.14.0',
+                'framework': 'safetensors',
+                'framework_version': '0.3.1',
                 'input_shapes': {
                     'user_features': [None, 128],
                     'item_features': [None, 128]
@@ -213,9 +211,9 @@ class NightlyTrainingJob:
             }
             
             # Upload model
-            upload_result = await self.registry.upload_model(
+            upload_result = self.registry.upload_model(
                 customer_id=customer_id,
-                model_path=onnx_path,
+                model_path=model_path,
                 metadata=metadata,
                 model_type='two_tower'
             )
@@ -240,18 +238,18 @@ class NightlyTrainingJob:
                 return customers
             
             # Filter customers that need training
-            # (e.g., haven't been trained in last 24 hours, or have new data)
             customers_needing_training = []
             
             for customer_id in customers:
-                last_training = await self.registry.get_last_training_date(customer_id)
+                last_training = self.registry.get_last_training_date(customer_id)
                 
                 if not last_training:
                     customers_needing_training.append(customer_id)
                     continue
                 
                 # Check if training is needed (simple heuristic)
-                time_since_training = datetime.now() - last_training
+                last_training_dt = datetime.fromtimestamp(last_training)
+                time_since_training = datetime.now() - last_training_dt
                 if time_since_training > timedelta(hours=24):
                     customers_needing_training.append(customer_id)
             
@@ -333,10 +331,11 @@ def main(
         )
         
         # Run job
+        loop = asyncio.get_event_loop()
         if customer:
-            stats = asyncio.run(job.run(customer_ids=[customer], force_training=force))
+            stats = loop.run_until_complete(job.run(customer_ids=[customer], force_training=force))
         else:
-            stats = asyncio.run(job.run(force_training=force, max_concurrent=concurrent))
+            stats = loop.run_until_complete(job.run(force_training=force, max_concurrent=concurrent))
         
         # Exit with appropriate code
         if stats['failed_customers'] > 0:

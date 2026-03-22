@@ -4,6 +4,7 @@ import torch.optim as optim
 from pathlib import Path
 from loguru import logger
 from typing import Any, Tuple, List
+from safetensors.torch import save_file
 
 from .models import VisionAuditorHead, TribeConductorHead
 
@@ -13,7 +14,7 @@ class BlackboxSovereignTrainer:
     
     This class is designed to be Cythonized into `trainer.so`.
     It pulls raw DNA from the local ClickHouse instance, trains the 
-    Student Heads on-premise, and exports ONNX models for Rust ingestion.
+    Student Heads on-premise, and exports .safetensors weights for Rust ingestion.
     """
     def __init__(self, db_client: Any, output_dir: str):
         self.db = db_client
@@ -70,13 +71,10 @@ class BlackboxSovereignTrainer:
 
         logger.success("[Vision Auditor] Local Head Training Complete.")
         
-        # The Rust Sidecar expects standard input names for multi-head inference
-        self._export_to_onnx(
+        # Export to pure-Rust Safetensors
+        self._export_to_safetensors(
             model=model,
-            filename="vision_head.onnx",
-            dummy_inputs=(torch.randn(1, 1024).to(self.device),),
-            input_names=["visual_dna"],
-            output_names=["safety_logits", "vibe_logits"]
+            filename="vision_head.safetensors"
         )
 
     def _fetch_offline_tribe_ledger(self) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -114,38 +112,25 @@ class BlackboxSovereignTrainer:
 
         logger.success(f"[Tribe Conductor] Ranking Loop Complete. Final Loss: {loss.item():.4f}")
         
-        # Export ranking model to be loaded by `ONNXInferenceStage` in Rust
-        self._export_to_onnx(
+        # Export ranking model to be loaded by Rust TrainingState
+        self._export_to_safetensors(
             model=model,
-            filename="ranking.onnx",
-            dummy_inputs=(torch.randn(1, 64).to(self.device), torch.randn(1, 1024).to(self.device)),
-            input_names=["tribe_embedding", "item_dna"],
-            output_names=["interaction_probability"]
+            filename="ranking_head.safetensors"
         )
 
-    def _export_to_onnx(self, model: nn.Module, filename: str, dummy_inputs: Tuple, 
-                        input_names: List[str], output_names: List[str]):
+    def _export_to_safetensors(self, model: nn.Module, filename: str):
         """
-        Serializes the trained PyTorch head into a highly optimized ONNX graph
-        for sub-millisecond execution inside the Rust `OnnxInferenceEngine`.
+        Serializes the trained PyTorch head into .safetensors format
+        for native execution inside the Rust `CandleInferenceEngine`.
         """
         model.eval()
         export_path = self.output_dir / filename
         
-        torch.onnx.export(
-            model,
-            dummy_inputs,
-            str(export_path),
-            export_params=True,
-            opset_version=14,
-            do_constant_folding=True,
-            input_names=input_names,
-            output_names=output_names,
-            dynamic_axes={
-                input_names[0]: {0: 'batch_size'} # Enable batching for inference
-            }
-        )
-        logger.info(f"Deployed secure ONNX graph -> {export_path.name}")
+        # Ensure weights are on CPU and in float32 for maximum compatibility
+        state_dict = {k: v.cpu().to(torch.float32) for k, v in model.state_dict().items()}
+        
+        save_file(state_dict, str(export_path))
+        logger.info(f"Deployed secure Safetensors weights -> {export_path.name}")
 
     def run_all_offline_pipelines(self):
         """
@@ -155,4 +140,3 @@ class BlackboxSovereignTrainer:
         self.train_and_export_vision_head()
         self.train_and_export_ranking_head()
         logger.success("=== All Student Heads Exported for Rust Ingestion ===")
-

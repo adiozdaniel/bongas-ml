@@ -138,45 +138,34 @@ def validate(
 @cli.command()
 @click.option('--customer-id', required=True, help='Customer ID to export')
 @click.option('--model-path', required=True, help='Path to trained model')
-@click.option('--output-dir', default='./outputs', help='Output directory for ONNX model')
-@click.option('--model-name', help='Custom ONNX model name')
-@click.option('--user-feature-dim', default=128, help='User feature dimension')
-@click.option('--item-feature-dim', default=128, help='Item feature dimension')
-@click.option('--optimize', is_flag=True, help='Optimize ONNX model')
+@click.option('--output-dir', default='./outputs', help='Output directory for Safetensors weights')
+@click.option('--model-name', help='Custom Safetensors model name')
 def export(
     customer_id: str,
     model_path: str,
     output_dir: str,
-    model_name: Optional[str],
-    user_feature_dim: int,
-    item_feature_dim: int,
-    optimize: bool
+    model_name: Optional[str]
 ):
-    """Export model to ONNX format"""
+    """Export model to Safetensors format"""
     
     logger.info(f"Exporting model for customer {customer_id}")
     
     try:
-        from export.onnx_exporter import ONNXExporter
+        from export.safetensors_exporter import SafetensorsExporter
         
         # Load model
         trainer = CustomerModelTrainer()
         model = trainer.load_model(Path(model_path))
         
-        # Export to ONNX
-        exporter = ONNXExporter(output_dir)
-        metadata = exporter.export_two_tower(
+        # Export to Safetensors
+        exporter = SafetensorsExporter(output_dir)
+        output_path = exporter.export(
             model,
-            model_name=model_name or f"onnx_model_{customer_id}",
-            user_feature_dim=user_feature_dim,
-            item_feature_dim=item_feature_dim,
-            optimize=optimize
+            model_name=model_name or f"safetensors_model_{customer_id}"
         )
         
         logger.info(f"Model exported successfully!")
-        logger.info(f"ONNX path: {metadata['onnx_path']}")
-        logger.info(f"Accuracy match: {metadata['accuracy_match']:.6f}")
-        logger.info(f"Model size: {metadata['model_size_mb']:.2f} MB")
+        logger.info(f"Safetensors path: {output_path}")
         
     except Exception as e:
         logger.error(f"Export failed: {e}")

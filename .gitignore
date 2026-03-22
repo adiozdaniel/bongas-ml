@@ -145,7 +145,6 @@ Desktop.ini
 # Model files
 *.pth
 *.pt
-*.onnx
 *.pb
 *.h5
 *.joblib
