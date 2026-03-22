@@ -22,8 +22,8 @@ graph LR
         subgraph VendorEnv ["Bongas-ML Factory (Vendor Server)"]
             GoldenData["Golden Datasets<br/>(Global Content)"]
             PreTraining["Foundation Pre-Training<br/>(Heavy Compute)"]
-            Obfuscator["Cython Compiler<br/>(IP Protection)"]
-            VendorImage["Docker Image: bongas-ml-engine:latest<br/>(Layers: Frozen Senses + trainer.so)"]
+            Obfuscator["Binary Obfuscation<br/>(IP Protection)"]
+            VendorImage["Docker Image: bongas-ai-sovereign:latest<br/>(Single Binary Engine)"]
         end
 
         %% Force Vertical Stack in LR Graph
@@ -34,11 +34,11 @@ graph LR
     subgraph ClientVPC ["Client Sovereign VPC (On-Premise)"]
         RawContent["Raw Videos / Content"]
         ClickHouse["ClickHouse<br/>(Feedback & Ledgers)"]
-        BongasAIBin["Bongas-AI Binary<br/>(Security)"]
+        BongasAIBin["Bongas-AI Binary<br/>(Security & Intelligence)"]
         MLContainer["Asynchronous ML Sidecar<br/>(Docker Container)"]
         
         subgraph SovereignEngine ["Sovereign Training Engine"]
-            ExecTrainer["trainer.so<br/>(Orchestrator & Execution)"]
+            NativeTrainer["Native Rust Trainer<br/>(Integrated in binary)"]
             ExecSenses["weights.safetensors<br/>(Frozen Inference)"]
             
             VisionTuned["vision_head.safetensors<br/>(Fine-Tuned)"]
@@ -60,7 +60,7 @@ graph LR
 
     %% Server to VPC Delivery (Docker Pull)
     RegistryAPI --->|Docker Pull Layered| MLContainer
-    MLContainer -->|Top Layer| ExecTrainer
+    MLContainer -->|Top Layer| BongasAIBin
     MLContainer -->|Base Layer| ExecSenses
     MLContainer -->|Base Layer| VisionTuned
     MLContainer -->|Base Layer| SLMTuned
@@ -68,19 +68,18 @@ graph LR
     MLContainer -->|Base Layer| RankingTuned
 
     %% Sovereign Orchestration & Security
-    ExecTrainer -->|Verifies Security| BongasAIBin
-    ExecTrainer <--->|mTLS Heart Beat & Decryption Keys| RegistryAPI
+    BongasAIBin <--->|mTLS Heart Beat & Keys| RegistryAPI
     
     %% Sensing & Feedback Loop
     RawContent --> ExecSenses
     ExecSenses -->|Semantic DNA| ClickHouse
-    ClickHouse -->|Ledgers| ExecTrainer
+    ClickHouse -->|Ledgers| BongasAIBin
     
     %% Sovereign Training
-    ExecTrainer --> VisionTuned
-    ExecTrainer --> SLMTuned
-    ExecTrainer --> FlowTuned
-    ExecTrainer --> RankingTuned
+    BongasAIBin --> VisionTuned
+    BongasAIBin --> SLMTuned
+    BongasAIBin --> FlowTuned
+    BongasAIBin --> RankingTuned
 ```
 
 To maintain both data sovereignty and intellectual property, the architecture is split into two distinct execution tiers:
@@ -97,9 +96,10 @@ We pre-train massive models (e.g., 1.2B+ parameters) on our proprietary "Golden 
 
 The "Frozen Senses" produce semantic DNA vectors. The **Student Heads** are minimal neural networks that learn to translate that DNA into the client's specific business metrics.
 
-* **Format:** Lightweight, trainable PyTorch modules (eventually exported as Safetensors).
-* **Role:** Trained on the client's on-premise ClickHouse interaction ledgers.
+* **Format:** Lightweight, trainable Rust modules (native Candle).
+* **Role:** Trained asynchronously by the native Rust Training Pillar.
 * **Intelligence:** This is the part that learns the "Local Context" (e.g., specific regional safety standards, custom tribal tags).
+* **Integrated Trainer:** All training logic is compiled directly into the `bongas-ai` binary. This ensures IP protection through machine-code obfuscation without requiring external sidecar processes.
 
 ---
 
@@ -133,39 +133,37 @@ We have unified all discovery intelligence into four specialized pillars:
 
 ---
 
-## 🛡️ The Security Model: The ML Sidecar & Cryptographic Leash
+## 🛡️ The Security Model: The Unified Engine
 
-The code that trains the **Student Heads** is our most sensitive IP, and the 1.3GB+ foundation model poses a massive deployment challenge. We solve this by abandoning raw files and using a **Sovereign Docker Image** with a **Cryptographic Leash**.
+Bongas-AI achieves **100% Data Sovereignty** by moving model evolution and engine orchestration directly into the client's VPC. We provide a true "Single Binary" experience where all intelligence and security are native to the Rust core.
 
-### 1. The Layered Docker Architecture (`bongas-ml-engine:latest`)
+### 1. The Single Binary Architecture (`bongas-ai-sovereign:latest`)
 
-We distribute intelligence as a strictly compiled Docker image.
+We distribute intelligence as a strictly compiled Rust executable.
 
-* **The Base Layer (Heavy/Frozen):** Contains the 1.3GB `weights.safetensors` (Frozen Senses). This layer rarely changes, meaning the client downloads it once.
-* **The Top Layer (Light/Agile):** Contains `trainer.so` (the obfuscated Cython training loops). If we push a 5MB math patch, the client's Docker daemon only downloads this tiny 5MB layer, ensuring instant updates without network strain.
+* **The Senses Layer:** Contains the 1.3GB `weights.safetensors` (Frozen Senses).
+* **The Intelligence Core:** Contains the high-performance Rust engine. All security heartbeats and training loops are integrated natively.
 
-### 2. The Cryptographic Leash (3-Tier Security)
+### 2. Integrated Sovereign Guard (3-Tier Security)
 
-If the client isolates the container, the IP protects itself:
+The binary protects itself using built-in resilience layers:
 
-* **Tier 1 (mTLS):** The ML Docker container and the Rust `bongas-ai` binary communicate using Mutual TLS certificates generated dynamically by `Bongas-Server`.
-* **Tier 2 (Decryption Keys):** The Frozen Senses and Base Heads are shipped *encrypted*. On startup, `trainer.so` performs a heartbeat to `Bongas-Server` to fetch runtime decryption keys into memory.
-* **Tier 3 (Dynamic Hyperparameters):** `trainer.so` does not contain hardcoded learning rates or decay functions. It requests them from the central server. If the network is cut, the training loop degrades and fails.
+* **Tier 1 (mTLS):** The Rust `bongas-ai` binary and `Bongas-Server` communicate using Mutual TLS certificates generated dynamically.
+* **Tier 2 (Decryption Keys):** The Frozen Senses are shipped *encrypted*. On startup, the engine performs a heartbeat to `Bongas-Server` to fetch runtime decryption keys into memory.
+* **Tier 3 (Binary Integrity):** The engine constantly monitors its own SHA-256 hash. If tampering is detected, it enters a protective lockdown state.
 
 ---
 
-## 🔄 Sovereign Lifecycle: Orchestrator-Led Hot-Swaps
+## 🔄 Sovereign Lifecycle: Self-Orchestrated Hot-Swaps
 
-We achieve **zero-touch, silent updates** of the core `bongas-ai` binary without the client executing scripts or tripping the `trainer.so` security guard.
+We achieve **zero-touch, silent updates** of the core `bongas-ai` binary natively.
 
-1. **Registry Pre-Flight:** The CI/CD pipeline pushes a new `bongas-ai` binary (v2.1) to `Bongas-Server` and registers its new SHA-256 hash.
-2. **The Secure Ping:** During its nightly heartbeat, `trainer.so` detects the outdated version and receives the secure download link and the new valid hash.
-3. **Staging:** `trainer.so` silently downloads the new binary into a hidden temporary folder and verifies the cryptographic hash against the server's signature.
+1. **Registry Pre-Flight:** The CI/CD pipeline pushes a new `bongas-ai` binary (v2.1) to `Bongas-Server`.
+2. **The Secure Ping:** During its internal heartbeat, the engine detects the outdated version and receives a secure download link.
+3. **Staging:** The engine silently downloads the new binary into a hidden temporary folder and verifies the cryptographic hash.
 4. **The "Graceful" Hot-Swap:**
-    * `trainer.so` updates its internal security ledger to authorize the new hash.
-    * It sends a signal to the running `bongas-ai` process to drain requests and shut down gracefully.
-    * It replaces the binary file.
-    * It spins the new `bongas-ai` process back up, re-verifies the hash, and restores mTLS connections. Zero client intervention required.
+    * The engine sends a signal to its own process manager to drain requests.
+    * It triggers a silent update, replacing the binary and restarting with the new configuration. Zero client intervention required.
 
 ---
 [🏠 Hub](../README.md) | [🔝 Top](#️-sovereign-intelligence-architecture--principles)

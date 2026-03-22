@@ -2,7 +2,7 @@
 
 > **The Vendor Safe Haven: Secure, Offline Development & Obfuscation Layer.**
 
-Welcome to **BONGAS-ML**. This repository is the high-security environment for pre-training massive foundation models and compiling the "Blackbox" intelligence that powers the Bongas-AI ecosystem.
+Welcome to **BONGAS-ML**. This repository is the high-security environment for pre-training massive foundation models and defining the intelligence that powers the Bongas-AI ecosystem.
 
 ---
 
@@ -24,8 +24,8 @@ graph LR
         subgraph VendorEnv ["Bongas-ML Factory (Vendor Server)"]
             GoldenData["Golden Datasets<br/>(Global Content)"]
             PreTraining["Foundation Pre-Training<br/>(Heavy Compute)"]
-            Obfuscator["Cython Compiler<br/>(IP Protection)"]
-            VendorImage["Docker Image: bongas-ml-engine:latest<br/>(Layers: Frozen Senses + trainer.so)"]
+            Obfuscator["Binary Obfuscation<br/>(IP Protection)"]
+            VendorImage["Docker Image: bongas-ai-sovereign:latest<br/>(Single Binary Engine)"]
         end
 
         %% Force Vertical Stack in LR Graph
@@ -36,11 +36,11 @@ graph LR
     subgraph ClientVPC ["Client Sovereign VPC (On-Premise)"]
         RawContent["Raw Videos / Content"]
         ClickHouse["ClickHouse<br/>(Feedback & Ledgers)"]
-        BongasAIBin["Bongas-AI Binary<br/>(Security)"]
+        BongasAIBin["Bongas-AI Binary<br/>(Security & Intelligence)"]
         MLContainer["Asynchronous ML Sidecar<br/>(Docker Container)"]
         
         subgraph SovereignEngine ["Sovereign Training Engine"]
-            ExecTrainer["trainer.so<br/>(Orchestrator & Execution)"]
+            NativeTrainer["Native Rust Trainer<br/>(Integrated in binary)"]
             ExecSenses["weights.safetensors<br/>(Frozen Inference)"]
             
             VisionTuned["vision_head.safetensors<br/>(Fine-Tuned)"]
@@ -62,7 +62,7 @@ graph LR
 
     %% Server to VPC Delivery (Docker Pull)
     RegistryAPI --->|Docker Pull Layered| MLContainer
-    MLContainer -->|Top Layer| ExecTrainer
+    MLContainer -->|Top Layer| BongasAIBin
     MLContainer -->|Base Layer| ExecSenses
     MLContainer -->|Base Layer| VisionTuned
     MLContainer -->|Base Layer| SLMTuned
@@ -70,26 +70,25 @@ graph LR
     MLContainer -->|Base Layer| RankingTuned
 
     %% Sovereign Orchestration & Security
-    ExecTrainer -->|Verifies Security| BongasAIBin
-    ExecTrainer <--->|mTLS Heart Beat & Decryption Keys| RegistryAPI
+    BongasAIBin <--->|mTLS Heart Beat & Keys| RegistryAPI
     
     %% Sensing & Feedback Loop
     RawContent --> ExecSenses
     ExecSenses -->|Semantic DNA| ClickHouse
-    ClickHouse -->|Ledgers| ExecTrainer
+    ClickHouse -->|Ledgers| BongasAIBin
     
     %% Sovereign Training
-    ExecTrainer --> VisionTuned
-    ExecTrainer --> SLMTuned
-    ExecTrainer --> FlowTuned
-    ExecTrainer --> RankingTuned
+    BongasAIBin --> VisionTuned
+    BongasAIBin --> SLMTuned
+    BongasAIBin --> FlowTuned
+    BongasAIBin --> RankingTuned
 ```
 
 To balance **Data Sovereignty** with **Intellectual Property Protection**, this engine operates on a bifurcated architecture:
 
 * **👁️ Frozen Senses:** 1.2B+ parameter models exported as read-only Safetensors.
-* **🎓 Student Heads:** Minimal layers trained locally on private ClickHouse telemetry.
-* **🛡️ trainer.so:** A Cythonized, obfuscated orchestrator that keeps our math secret.
+* **🎓 Student Heads:** Minimal layers trained locally on private ClickHouse telemetry via the native Rust Training Pillar.
+* **🛡️ Integrated Security:** The compiled binary handles its own integrity checks, heartbeats, and silent updates.
 
 ## 📚 Documentation Hub
 
