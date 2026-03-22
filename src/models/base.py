@@ -1,7 +1,7 @@
 """
 Base model class for all BONGAS-ML models
 
-Provides common functionality for model training, evaluation, and serialization.
+Provides common functionality for model training, evaluation, and serialization (Safetensors).
 """
 
 from abc import ABC, abstractmethod

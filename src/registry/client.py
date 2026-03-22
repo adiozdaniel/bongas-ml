@@ -86,8 +86,8 @@ class ModelRegistryClient:
                 'model_type': model_type,
                 'version': version or self._generate_version(),
                 'stage': stage,
-                'framework': 'onnx',
-                'framework_version': '1.14.0',
+                'framework': 'safetensors',
+                'framework_version': '0.3.1',
                 'upload_timestamp': time.time(),
                 'file_size': model_path.stat().st_size,
                 **metadata
@@ -189,7 +189,7 @@ class ModelRegistryClient:
                     if filename:
                         output_path = Path(filename.strip('"'))
                     else:
-                        output_path = Path(f"model_{customer_id}_{int(time.time())}.onnx")
+                        output_path = Path(f"model_{customer_id}_{int(time.time())}.safetensors")
                 
                 output_path = Path(output_path)
                 output_path.parent.mkdir(parents=True, exist_ok=True)
