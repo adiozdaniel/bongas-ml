@@ -6,7 +6,7 @@
 
 ## The Goal
 
-Eliminate PyTorch as a dependency on the client's production server by converting foundation models to ONNX.
+Eliminate PyTorch as a dependency on the client's production server by converting foundation models to Safetensors.
 
 ## Standard Export Workflow
 
@@ -18,7 +18,7 @@ Eliminate PyTorch as a dependency on the client's production server by convertin
     python factory/exporters/export_base_model.py
     ```
 
-4. **Extract Artifacts:** Compiled ONNX models are deposited into `../bongas-ai/release/models/frozen/`.
+4. **Extract Artifacts:** High-integrity .safetensors weights are deposited into `../bongas-ai/release/models/frozen/`.
 5. **Copy Preprocessors:** Critical `.json` configs are copied automatically.
 
 ---

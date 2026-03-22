@@ -41,10 +41,10 @@ graph LR
             ExecTrainer["trainer.so<br/>(Orchestrator & Execution)"]
             ExecSenses["weights.safetensors<br/>(Frozen Inference)"]
             
-            VisionTuned["vision_head.onnx<br/>(Fine-Tuned)"]
-            SLMTuned["slm_head.onnx<br/>(Fine-Tuned)"]
-            FlowTuned["flow_head.onnx<br/>(Fine-Tuned)"]
-            RankingTuned["ranking.onnx<br/>(Fine-Tuned)"]
+            VisionTuned["vision_head.safetensors<br/>(Fine-Tuned)"]
+            SLMTuned["slm_head.safetensors<br/>(Fine-Tuned)"]
+            FlowTuned["flow_head.safetensors<br/>(Fine-Tuned)"]
+            RankingTuned["ranking_head.safetensors<br/>(Fine-Tuned)"]
         end
     end
 
@@ -89,7 +89,7 @@ To maintain both data sovereignty and intellectual property, the architecture is
 
 We pre-train massive models (e.g., 1.2B+ parameters) on our proprietary "Golden Datasets" at the vendor site.
 
-* **Format:** Exported as optimized ONNX graphs or Read-Only `.safetensors`.
+* **Format:** Exported as Read-Only `.safetensors` (Candle-compatible).
 * **Role:** Performs heavy "Sensing" (Feature Extraction) on the client's raw data (Video, Text, Audio).
 * **Constraint:** These models are "Frozen" on the client site. They are never retrained or modified on-premise, ensuring zero data exfiltration during the learning process.
 
@@ -97,7 +97,7 @@ We pre-train massive models (e.g., 1.2B+ parameters) on our proprietary "Golden 
 
 The "Frozen Senses" produce semantic DNA vectors. The **Student Heads** are minimal neural networks that learn to translate that DNA into the client's specific business metrics.
 
-* **Format:** Lightweight, trainable PyTorch modules (eventually exported as ONNX).
+* **Format:** Lightweight, trainable PyTorch modules (eventually exported as Safetensors).
 * **Role:** Trained on the client's on-premise ClickHouse interaction ledgers.
 * **Intelligence:** This is the part that learns the "Local Context" (e.g., specific regional safety standards, custom tribal tags).
 
@@ -110,25 +110,25 @@ We have unified all discovery intelligence into four specialized pillars:
 ### 👁️ The Eye (Vision Intelligence)
 
 * **Base:** `sight-core` (Frozen)
-* **Student:** `vision_head.onnx`
+* **Student:** `vision_head.safetensors`
 * **Responsibility:** Forensic maturity auditing (18+, Kids), Motion Entropy, and visual vibe categorization.
 
 ### 📚 The Librarian (Language Intelligence)
 
 * **Base:** `sense-core` (Frozen SLM)
-* **Student:** `slm_head.onnx`
+* **Student:** `slm_head.safetensors`
 * **Responsibility:** Reasoning, generating content summaries, and cultural tag refinement.
 
 ### 🎻 The Conductor (Tribe Intelligence)
 
 * **Base:** Generic Tribe Embeddings
-* **Student:** `ranking.onnx`
+* **Student:** `ranking_head.safetensors`
 * **Responsibility:** Mapping Behavioral Tribes to Content DNA based on local aggregate interaction logs.
 
 ### 🏎️ The Sequence (Flow Intelligence)
 
 * **Base:** `flow-core` (BERT4Rec-style Transformer)
-* **Student:** `flow_head.onnx`
+* **Student:** `flow_head.safetensors`
 * **Responsibility:** Predicting the user's "next-path" in a session based on real-time sequential history.
 
 ---

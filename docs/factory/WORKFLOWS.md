@@ -12,7 +12,7 @@ This document outlines the internal **Vendor-Only** processes for preparing a mo
 
 ### 1. Exporters (`factory/exporters/`)
 
-Used to convert massive PyTorch foundation models into optimized, obfuscated ONNX base models.
+Used to convert massive PyTorch foundation models into optimized, high-integrity .safetensors base models.
 
 * **Logic:** `export_base_model.py`
 * **Guide:** [📦 Exporters Detailed Guide](./EXPORTERS.md)

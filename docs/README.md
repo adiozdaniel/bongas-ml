@@ -17,7 +17,7 @@ Understand the philosophy and structural boundaries of the Sovereign system.
 Guides on the internal processes for preparing model releases.
 
 * **[⚙️ General Workflows](./factory/WORKFLOWS.md):** High-level Build & Ship pipeline.
-* **[📦 Exporters: Foundation Models](./factory/EXPORTERS.md):** .safetensors -> .onnx conversion.
+* **[📦 Exporters: Foundation Models](./factory/EXPORTERS.md):** High-integrity .safetensors extraction for Rust.
 * **[🧠 Trainer: Student Loops](./factory/TRAINER.md):** Refining the local training logic.
 * **[🛡️ Builders: Obfuscation](./factory/BUILDERS.md):** Creating the secure `trainer.so`.
 

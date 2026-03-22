@@ -43,10 +43,10 @@ graph LR
             ExecTrainer["trainer.so<br/>(Orchestrator & Execution)"]
             ExecSenses["weights.safetensors<br/>(Frozen Inference)"]
             
-            VisionTuned["vision_head.onnx<br/>(Fine-Tuned)"]
-            SLMTuned["slm_head.onnx<br/>(Fine-Tuned)"]
-            FlowTuned["flow_head.onnx<br/>(Fine-Tuned)"]
-            RankingTuned["ranking.onnx<br/>(Fine-Tuned)"]
+            VisionTuned["vision_head.safetensors<br/>(Fine-Tuned)"]
+            SLMTuned["slm_head.safetensors<br/>(Fine-Tuned)"]
+            FlowTuned["flow_head.safetensors<br/>(Fine-Tuned)"]
+            RankingTuned["ranking_head.safetensors<br/>(Fine-Tuned)"]
         end
     end
 
@@ -87,7 +87,7 @@ graph LR
 
 To balance **Data Sovereignty** with **Intellectual Property Protection**, this engine operates on a bifurcated architecture:
 
-* **👁️ Frozen Senses:** 1.2B+ parameter models exported as read-only ONNX graphs.
+* **👁️ Frozen Senses:** 1.2B+ parameter models exported as read-only Safetensors.
 * **🎓 Student Heads:** Minimal layers trained locally on private ClickHouse telemetry.
 * **🛡️ trainer.so:** A Cythonized, obfuscated orchestrator that keeps our math secret.
 

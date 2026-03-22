@@ -10,7 +10,7 @@ This document summarizes the complete implementation of the BONGAS-ML package, w
 bongas-ml/
 ├── src/                          # Core ML package
 │   ├── data/                     # Data loading and preprocessing
-│   ├── export/                   # ONNX export and optimization
+│   ├── export/                   # Safetensors export (Pure-Rust)
 │   ├── features/                 # Feature engineering
 │   ├── models/                   # Model definitions
 │   ├── registry/                 # Model registry client
@@ -19,7 +19,7 @@ bongas-ml/
 │   └── utils/                    # Utility functions
 ├── factory/                      # Factory design components
 │   ├── builders/                 # Model construction logic
-│   ├── exporters/                # Specialized ONNX exporters
+│   ├── exporters/                # Specialized Safetensors exporters
 │   ├── trainer/                  # Obfuscated sovereign training
 │   └── legacy_scripts/           # Deprecated utilities
 ├── research/                     # Exploratory Data Analysis (EDA) sandbox
@@ -51,7 +51,7 @@ bongas-ml/
 
 - Abstract base class for all models
 - Device management and model saving/loading
-- ONNX export interface
+- Safetensors export interface
 - Configuration management
 
 **TwoTowerModel**:
@@ -71,20 +71,6 @@ bongas-ml/
 - Configurable callbacks
 - Progress tracking and logging
 
-**TrainingDataset**:
-
-- Efficient data loading
-- Feature preprocessing
-- Batch handling
-- Memory optimization
-
-**Callbacks**:
-
-- Early stopping based on validation metrics
-- Model checkpointing
-- Learning rate scheduling
-- Custom callback support
-
 ### 3. Feature Engineering (`src/features/`)
 
 **FeatureExtractor**:
@@ -94,49 +80,27 @@ bongas-ml/
 - Temporal feature processing
 - Feature validation
 
-**FeatureTransformer**:
-
-- Feature scaling and normalization
-- Categorical encoding
-- Feature selection
-- Pipeline integration
-
-**Embeddings**:
-
-- Embedding layer management
-- Pre-trained embedding loading
-- Embedding optimization
-- Memory-efficient storage
-
 ### 4. Model Export (`src/export/`)
 
-**ONNXExporter**:
+**SafetensorsExporter**:
 
-- PyTorch to ONNX conversion
-- Dynamic input handling
-- Model optimization integration
-- Comprehensive validation
-
-**Optimization**:
-
-- Graph optimization techniques
-- Quantization for size reduction
-- Performance benchmarking
-- Cross-platform compatibility
+- PyTorch to .safetensors conversion
+- Dynamic weight extraction for Rust Candle
+- Pure-Rust deployment support
+- High-integrity validation
 
 **Validation**:
 
 - Accuracy validation against PyTorch
-- Performance benchmarking
-- Model integrity checks
-- Compatibility validation
+- Model weight integrity checks
+- Compatibility validation for Candle runtime
 
 ### 5. Model Registry (`src/registry/`)
 
 **ModelRegistryClient**:
 
 - REST API client for bongas-server
-- Model upload/download functionality
+- Model upload/download functionality (.safetensors)
 - Version management and staging
 - Customer-specific model handling
 - Metadata management
@@ -150,29 +114,6 @@ bongas-ml/
 - Binary classification and ranking metrics
 - Comprehensive reporting
 
-**BaselineComparator**:
-
-- Model comparison against baselines
-- Improvement threshold checking
-- Regression detection
-- Detailed comparison reports
-
-**ShadowTester**:
-
-- Live shadow testing implementation
-- Traffic sampling and monitoring
-- Production validation
-- Automated promotion recommendations
-
-### 7. Utilities (`src/utils/`)
-
-**Logging**:
-
-- Centralized logging configuration
-- Structured logging with loguru
-- Performance monitoring
-- Debug and production modes
-
 ## CLI Interface
 
 The package provides a comprehensive CLI interface:
@@ -182,13 +123,13 @@ The package provides a comprehensive CLI interface:
 python -m ml train --data data.csv --model-type two_tower --epochs 100
 
 # Export models
-python -m ml export --model model.pth --output model.onnx --optimize --quantize
+python -m ml export --model model.pth --output model.safetensors
 
 # Validate models
-python -m ml validate --model model.onnx --test-data test.csv
+python -m ml validate --model model.safetensors --test-data test.csv
 
 # Registry operations
-python -m ml registry upload --model model.onnx --customer customer123
+python -m ml registry upload --model model.safetensors --customer customer123
 ```
 
 ## Integration with BONGAS-AI Architecture
@@ -197,7 +138,7 @@ python -m ml registry upload --model model.onnx --customer customer123
 
 1. **bongas-ai** (Main repository):
    - Rust-based serving infrastructure
-   - ONNX runtime integration
+   - Candle (Pure-Rust) runtime integration
    - Feature store and caching
    - API endpoints and scenarios
 
@@ -215,41 +156,11 @@ python -m ml registry upload --model model.onnx --customer customer123
 
 ### Key Integration Points
 
-1. **Model Export**: PyTorch models exported to ONNX format for serving
+1. **Model Export**: PyTorch models exported to .safetensors format for serving
 2. **Feature Consistency**: Shared feature engineering between training and serving
 3. **Registry Integration**: Seamless model upload/download between repositories
 4. **Validation Pipeline**: Quality gates ensure model reliability
 5. **Configuration Sharing**: Common configuration formats across repositories
-
-## Development Features
-
-### Testing
-
-- Comprehensive test suite with pytest
-- Unit tests for all major components
-- Integration tests for end-to-end workflows
-- Mock testing for external dependencies
-
-### Code Quality
-
-- Black code formatting
-- Flake8 linting
-- MyPy type checking
-- Pre-commit hooks for quality assurance
-
-### Documentation
-
-- Sphinx-based documentation
-- API reference generation
-- Usage examples and tutorials
-- Architecture documentation
-
-### Packaging
-
-- Modern pyproject.toml configuration
-- Legacy setup.py for compatibility
-- Multiple installation options (dev, docs, test)
-- Console script entry points
 
 ## Production Readiness
 
@@ -258,7 +169,7 @@ python -m ml registry upload --model model.onnx --customer customer123
 - Optimized training loops
 - Memory-efficient data loading
 - Multi-GPU training support
-- Model quantization and optimization
+- Model optimization for pure-Rust serving
 
 ### Reliability
 
@@ -267,36 +178,13 @@ python -m ml registry upload --model model.onnx --customer customer123
 - Shadow testing for production safety
 - Rollback capabilities
 
-### Scalability
-
-- Distributed training support
-- Efficient feature processing
-- Model versioning and staging
-- Customer isolation
-
-### Monitoring
-
-- Structured logging throughout
-- Performance metrics collection
-- Training progress tracking
-- Model quality monitoring
-
 ## Next Steps
 
 ### Immediate Actions
 
 1. **Migrate existing Python code** from bongas-ai repository
 2. **Update bongas-ai** to use the new bongas-ml package
-3. **Implement bongas-server** repository
-4. **Set up CI/CD** pipelines for all three repositories
-
-### Future Enhancements
-
-1. **Additional model types** (NCF, Wide & Deep, etc.)
-2. **Advanced feature engineering** (graph embeddings, temporal features)
-3. **Hyperparameter optimization** integration
-4. **AutoML capabilities** for model selection
-5. **Advanced deployment strategies** (canary, blue-green)
+3. **Set up CI/CD** pipelines for all three repositories
 
 ## Conclusion
 

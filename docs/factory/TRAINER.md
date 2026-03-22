@@ -19,7 +19,7 @@ Training lightweight "Student Heads" locally on-premise using ClickHouse interac
 
 1. **Fetch Local Ledger:** Queries `sovereign_sight_ledger`.
 2. **Optimize:** Standard PyTorch training loop.
-3. **ONNX Export:** Serializes the trained network for the Rust Stage.
+3. **Safetensors Export:** Serializes the trained network weights for native Rust execution.
 
 ---
 [🏠 Hub](../README.md) | [🔝 Top](#-factory-trainer-refining-the-student-loops)
