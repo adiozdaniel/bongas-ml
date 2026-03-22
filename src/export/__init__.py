@@ -1,24 +1,15 @@
 """
-ONNX Export and Optimization for BONGAS-ML
+Safetensors Export and Optimization for BONGAS-ML
+(Pure-Rust Singularity Stack)
 
 This package provides:
-- ONNXExporter: Main exporter for PyTorch to ONNX conversion
-- Model optimization with quantization and graph optimization
-- Comprehensive model validation and benchmarking
-- Compatibility checking across execution providers
+- SafetensorsExporter: Main exporter for PyTorch to .safetensors conversion
+- Support for true single-binary Rust deployments (Candle)
 """
 
-from .onnx_exporter import ONNXExporter
-from .optimize import optimize_onnx_model, get_model_statistics, compare_models, validate_optimization
-from .validate import validate_onnx_model, validate_model_compatibility, generate_validation_report
+from .safetensors_exporter import SafetensorsExporter, export_model_to_sovereign
 
 __all__ = [
-    "ONNXExporter",
-    "optimize_onnx_model",
-    "get_model_statistics", 
-    "compare_models",
-    "validate_optimization",
-    "validate_onnx_model",
-    "validate_model_compatibility",
-    "generate_validation_report",
+    "SafetensorsExporter",
+    "export_model_to_sovereign",
 ]
