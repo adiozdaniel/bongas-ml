@@ -24,4 +24,4 @@ With the migration to a **100% Rust-native ML stack**, the legacy Cython-based `
 *Previously, we used `factory/builders/compile_trainer.py` to generate `trainer.so`. This is no longer required for Symphony 3.0 deployments.*
 
 ---
-[🏠 Hub](../README.md) | [🔝 Top](#-factory-builders-integrated-binary-security)
+[🏠 Hub](../README.md) | [🔝 Top](# -factory-builders-integrated-binary-security)
