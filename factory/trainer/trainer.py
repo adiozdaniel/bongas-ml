@@ -6,7 +6,7 @@ from loguru import logger
 from typing import Any, Tuple, List
 from safetensors.torch import save_file
 
-from .models import VisionAuditorHead, TribeConductorHead
+from .models import VisionAuditorHead, TribeConductorHead, SovereignAudioHead
 
 class BlackboxSovereignTrainer:
     """
@@ -33,34 +33,34 @@ class BlackboxSovereignTrainer:
         
         # Phase 1 Simulation Data:
         # X: The heavy 1.2B vectors (Extracted asynchronously by Rust)
-        X_visual_dna = torch.randn(100, 1024).to(self.device)
+        x_visual_dna = torch.randn(100, 1024).to(self.device)
         
         # Y: The client's custom categories (e.g., 0: GE, 1: PG, 2: 18+)
-        Y_safety = torch.randint(0, 3, (100,)).to(self.device)
+        y_safety = torch.randint(0, 3, (100,)).to(self.device)
         
         # Y: The client's specific semantic tags (e.g., 'High-Energy')
-        Y_vibe = torch.randint(0, 10, (100,)).to(self.device)
+        y_vibe = torch.randint(0, 10, (100,)).to(self.device)
         
-        return X_visual_dna, Y_safety, Y_vibe
+        return x_visual_dna, y_safety, y_vibe
 
     def train_and_export_vision_head(self, epochs: int = 15):
         """Trains the Vision Auditor Head on local catalog DNA."""
         logger.info("[Vision Auditor] Initializing Local Student Head...")
         model = VisionAuditorHead().to(self.device)
         
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
         criterion = nn.CrossEntropyLoss()
 
-        X, Y_safety, Y_vibe = self._fetch_offline_vision_ledger()
+        x, y_safety, y_vibe = self._fetch_offline_vision_ledger()
 
         model.train()
         for epoch in range(epochs):
             optimizer.zero_grad()
-            safety_preds, vibe_preds = model(X)
+            safety_preds, vibe_preds = model(x)
             
             # Joint objective: Minimize both safety prediction and vibe errors
-            loss_safety = criterion(safety_preds, Y_safety)
-            loss_vibe = criterion(vibe_preds, Y_vibe)
+            loss_safety = criterion(safety_preds, y_safety)
+            loss_vibe = criterion(vibe_preds, y_vibe)
             loss = loss_safety + loss_vibe
             
             loss.backward()
@@ -85,27 +85,27 @@ class BlackboxSovereignTrainer:
         logger.info("[Tribe Conductor] Fetching local interaction telemetry...")
         
         # Simulated behavioral data (Aggregated by Tribe, NOT by user_id)
-        X_tribe = torch.randn(500, 64).to(self.device)
-        X_item = torch.randn(500, 1024).to(self.device)
-        Y_interaction = torch.randint(0, 2, (500, 1), dtype=torch.float32).to(self.device)
+        x_tribe = torch.randn(500, 64).to(self.device)
+        x_item = torch.randn(500, 1024).to(self.device)
+        y_interaction = torch.randint(0, 2, (500, 1), dtype=torch.float32).to(self.device)
         
-        return X_tribe, X_item, Y_interaction
+        return x_tribe, x_item, y_interaction
 
     def train_and_export_ranking_head(self, epochs: int = 10):
         """Trains the Tribe Conductor to learn local aggregate affinities."""
         logger.info("[Tribe Conductor] Initializing Local Ranking Head...")
         model = TribeConductorHead().to(self.device)
         
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
         criterion = nn.BCELoss() # Binary Cross Entropy for interaction probability
 
-        X_tribe, X_item, Y_interaction = self._fetch_offline_tribe_ledger()
+        x_tribe, x_item, y_interaction = self._fetch_offline_tribe_ledger()
 
         model.train()
-        for epoch in range(epochs):
+        for _ in range(epochs):
             optimizer.zero_grad()
-            probability = model(X_tribe, X_item)
-            loss = criterion(probability, Y_interaction)
+            probability = model(x_tribe, x_item)
+            loss = criterion(probability, y_interaction)
             
             loss.backward()
             optimizer.step()
@@ -116,6 +116,44 @@ class BlackboxSovereignTrainer:
         self._export_to_safetensors(
             model=model,
             filename="ranking_head.safetensors"
+        )
+
+    def _fetch_offline_audio_ledger(self) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Queries ClickHouse for 'Audio DNA' signals extracted by The Ear.
+        """
+        logger.info("[Swahili Brain] Fetching local audio_dna and linguistic targets...")
+        x_audio_dna = torch.randn(100, 1024).to(self.device)
+        y_tokens = torch.randint(0, 32000, (100,)).to(self.device)
+        return x_audio_dna, y_tokens
+
+    def train_and_export_audio_head(self, epochs: int = 20):
+        """Trains the Swahili Brain (SLM Head) to decode latent Audio DNA."""
+        logger.info("[Swahili Brain] Initializing Local Audio Head (SLM)...")
+        model = SovereignAudioHead().to(self.device)
+        
+        optimizer = optim.Adam(model.parameters(), lr=0.0005, weight_decay=1e-5)
+        criterion = nn.CrossEntropyLoss()
+
+        x, y = self._fetch_offline_audio_ledger()
+
+        model.train()
+        for epoch in range(epochs):
+            optimizer.zero_grad()
+            logits = model(x)
+            loss = criterion(logits, y)
+            
+            loss.backward()
+            optimizer.step()
+
+            if (epoch + 1) % 10 == 0:
+                logger.debug(f"Epoch {epoch+1}/{epochs} | Loss: {loss.item():.4f}")
+
+        logger.success("[Swahili Brain] Linguistic Bridge Training Complete.")
+        
+        self._export_to_safetensors(
+            model=model,
+            filename="slm_head.safetensors"
         )
 
     def _export_to_safetensors(self, model: nn.Module, filename: str):
@@ -139,4 +177,5 @@ class BlackboxSovereignTrainer:
         logger.info("=== Starting Sovereign Offline Batch Training ===")
         self.train_and_export_vision_head()
         self.train_and_export_ranking_head()
+        self.train_and_export_audio_head()
         logger.success("=== All Student Heads Exported for Rust Ingestion ===")
