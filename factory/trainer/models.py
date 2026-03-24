@@ -77,3 +77,33 @@ class TribeConductorHead(nn.Module):
         combined_features = torch.cat([tribe_embedding, item_dna], dim=-1)
         probability = self.mlp(combined_features)
         return probability
+
+
+class SovereignAudioHead(nn.Module):
+    """
+    The Local Student Head for Audio Intelligence (The Swahili Brain).
+    
+    Implements 'Distillation over Memorization' by taking the 1024-dimensional 
+    dense vector (Audio DNA) from the frozen foundation backbone and 
+    mapping it to linguistic tokens and semantic metadata.
+    
+    Architecture:
+        - Input: Audio DNA [batch_size, 1024]
+        - Output: Linguistic Tokens [batch_size, vocab_size]
+    """
+    def __init__(self, input_dim: int = 1024, hidden_dim: int = 512, vocab_size: int = 32000):
+        super().__init__()
+        
+        # The Linguistic Bridge: Mapping latent signals to tokens
+        self.bridge = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.LayerNorm(hidden_dim),
+            nn.GELU(),
+            nn.Dropout(p=0.1),
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.GELU(),
+            nn.Linear(hidden_dim // 2, vocab_size)
+        )
+
+    def forward(self, audio_dna: torch.Tensor) -> torch.Tensor:
+        return self.bridge(audio_dna)
