@@ -107,3 +107,56 @@ class SovereignAudioHead(nn.Module):
 
     def forward(self, audio_dna: torch.Tensor) -> torch.Tensor:
         return self.bridge(audio_dna)
+
+
+class StudentSequenceHead(nn.Module):
+    """
+    The Local Student Head for Reflex/Sequencing (The Flow).
+    
+    A lightweight 3-layer MLP optimized for high-velocity inference
+    to predict next-item transitions in real-time.
+    """
+    def __init__(self, input_dim: int = 768, hidden_dim: int = 256, output_dim: int = 768):
+        super().__init__()
+        self.ln1 = nn.Linear(input_dim, hidden_dim)
+        self.ln2 = nn.Linear(hidden_dim, hidden_dim // 2)
+        self.output = nn.Linear(hidden_dim // 2, output_dim)
+        self.relu = nn.ReLU()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.relu(self.ln1(x))
+        x = self.relu(self.ln2(x))
+        return self.output(x)
+
+
+class MultiHeadRankingHead(nn.Module):
+    """
+    Multi-Target Student Head for parallel engagement prediction.
+    Outputs [click_prob, watch_prob, like_prob].
+    """
+    def __init__(self, tribe_dim: int = 64, item_dim: int = 1024, hidden_dim: int = 128):
+        super().__init__()
+        
+        self.shared = nn.Sequential(
+            nn.Linear(tribe_dim + item_dim, hidden_dim),
+            nn.LayerNorm(hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(p=0.1),
+            nn.Linear(hidden_dim, 64),
+            nn.ReLU()
+        )
+        
+        self.head_click = nn.Linear(64, 1)
+        self.head_watch = nn.Linear(64, 1)
+        self.head_like = nn.Linear(64, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, tribe_embedding: torch.Tensor, item_dna: torch.Tensor) -> torch.Tensor:
+        combined = torch.cat([tribe_embedding, item_dna], dim=-1)
+        features = self.shared(combined)
+        
+        click = self.sigmoid(self.head_click(features))
+        watch = self.sigmoid(self.head_watch(features))
+        like = self.sigmoid(self.head_like(features))
+        
+        return torch.cat([click, watch, like], dim=-1)

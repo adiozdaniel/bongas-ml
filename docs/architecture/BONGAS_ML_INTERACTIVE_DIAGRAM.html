@@ -130,8 +130,7 @@
         subgraph VendorEnv ["Bongas-ML Factory (Vendor Server)"]
             GoldenData["Golden Datasets<br/>(Global Content)"]
             PreTraining["Foundation Pre-Training<br/>(Heavy Compute)"]
-            Obfuscator["Cython Compiler<br/>(IP Protection)"]
-            VendorImage["Docker Image: bongas-ml-engine:latest<br/>(Layers: Frozen Senses + trainer.so)"]
+            VendorImage["Docker Image: bongas-ml-engine:latest<br/>(Layers: Frozen Senses + Native Trainer)"]
         end
     end
 
@@ -143,30 +142,30 @@
         MLContainer["Asynchronous ML Sidecar<br/>(Docker Container)"]
 
         subgraph SovereignEngine ["Sovereign Training Engine"]
-            ExecTrainer["trainer.so<br/>(Orchestrator & Execution)"]
+            ExecTrainer["Native Rust Trainer<br/>(Candle Execution)"]
             ExecSenses["weights.safetensors<br/>(Frozen Inference)"]
 
-            VisionTuned["vision_head.safetensors<br/>(Fine-Tuned)"]
-            SLMTuned["slm_head.safetensors<br/>(Fine-Tuned)"]
-            FlowTuned["flow_head.safetensors<br/>(Fine-Tuned)"]
-            RankingTuned["ranking_head.safetensors<br/>(Fine-Tuned)"]
+            VisionTuned["vision_head.safetensors<br/>(Auditor)"]
+            SLMTuned["slm_head.safetensors<br/>(Librarian)"]
+            FlowTuned["flow_head.safetensors<br/>(Reflex)"]
+            RankingTuned["ranking_head.safetensors<br/>(Conductor)"]
+            MultiTuned["multi_head_ranking.safetensors<br/>(Multi-Target)"]
         end
     end
 
     %% --- CONNECTIONS ---
     %% Vendor Factory (Blue)
-    %% Indices 0-3
+    %% Indices 0-2
     GoldenData --> PreTraining
-    PreTraining --> Obfuscator
-    Obfuscator --> VendorImage
+    PreTraining --> VendorImage
     PreTraining -.-> VendorImage
 
     %% Export to Server (Purple)
-    %% Indices 4
+    %% Indices 3
     VendorImage --> RegistryAPI
 
     %% Server to VPC Delivery (Green)
-    %% Indices 5-11
+    %% Indices 4-11
     RegistryAPI --->|Docker Pull Layered| MLContainer
     MLContainer -->|Top Layer| ExecTrainer
     MLContainer -->|Base Layer| ExecSenses
@@ -174,10 +173,11 @@
     MLContainer -->|Base Layer| SLMTuned
     MLContainer -->|Base Layer| FlowTuned
     MLContainer -->|Base Layer| RankingTuned
+    MLContainer -->|Base Layer| MultiTuned
 
     %% Sovereign Orchestration & Security (Orange)
     %% Indices 12-13
-    ExecTrainer -->|Verifies Security| BongasAIBin
+    ExecTrainer -->|Binary Integrity Baseline| BongasAIBin
     ExecTrainer <--->|mTLS Heart Beat & Decryption Keys| RegistryAPI
 
     %% Sensing & Feedback Loop (Green)
@@ -187,11 +187,12 @@
     ClickHouse -->|Ledgers| ExecTrainer
 
     %% Sovereign Training (Orange)
-    %% Indices 17-20
+    %% Indices 17-21
     ExecTrainer --> VisionTuned
     ExecTrainer --> SLMTuned
     ExecTrainer --> FlowTuned
     ExecTrainer --> RankingTuned
+    ExecTrainer --> MultiTuned
 
     %% Force Vertical Stack in LR Graph (Hidden)
     CentralRegistry ~~~ VendorEnv
@@ -200,12 +201,12 @@
     classDef default fill:#ffffff,stroke:#475569,stroke-width:2px,color:#0f172a;
 
     %% Indices mapped to animation classes
-    linkStyle 0,1,2,3 stroke:#0984e3,stroke-width:2.5px,stroke-dasharray: 5 5;
-    linkStyle 4 stroke:#9b59b6,stroke-width:3px,stroke-dasharray: 5 5;
-    linkStyle 5,6,7,8,9,10,11 stroke:#00b894,stroke-width:3.5px,stroke-dasharray: 5 5;
+    linkStyle 0,1,2 stroke:#0984e3,stroke-width:2.5px,stroke-dasharray: 5 5;
+    linkStyle 3 stroke:#9b59b6,stroke-width:3px,stroke-dasharray: 5 5;
+    linkStyle 4,5,6,7,8,9,10,11 stroke:#00b894,stroke-width:3.5px,stroke-dasharray: 5 5;
     linkStyle 12,13 stroke:#e17055,stroke-width:2.5px,stroke-dasharray: 5 5;
     linkStyle 14,15,16 stroke:#00b894,stroke-width:3.5px,stroke-dasharray: 5 5;
-    linkStyle 17,18,19,20 stroke:#e17055,stroke-width:2.5px,stroke-dasharray: 5 5;            </div>
+    linkStyle 17,18,19,20,21 stroke:#e17055,stroke-width:2.5px,stroke-dasharray: 5 5;            </div>
         </div>
     </div>
 
