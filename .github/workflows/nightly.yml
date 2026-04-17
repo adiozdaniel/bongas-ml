@@ -1,9 +1,9 @@
 name: Nightly Training
 
 on:
-  schedule:
+  # schedule:
     # Run every day at 1:00 AM UTC
-    - cron: '0 1 * * *'
+    # - cron: '0 1 * * *'
   workflow_dispatch:
     inputs:
       customer_id:
